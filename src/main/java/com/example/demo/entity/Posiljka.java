@@ -61,9 +61,6 @@ public class Posiljka {
         this.korisnik = korisnik;
     }
 
-    @PrePersist
-    @PreUpdate
-
     public Long getId() {
         return id;
     }
