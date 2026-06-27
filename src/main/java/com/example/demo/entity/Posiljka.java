@@ -11,7 +11,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 
 import java.math.BigDecimal;
@@ -25,7 +24,7 @@ public class Posiljka {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String serijskiBroj;
 
     @Column(nullable = false, precision = 12, scale = 2)
@@ -59,6 +58,17 @@ public class Posiljka {
         this.opisSadrzaja = opisSadrzaja;
         this.napomenaIzmene = napomenaIzmene;
         this.korisnik = korisnik;
+    }
+
+    @PrePersist
+    public void prePersist() {
+        if (datumIzmene == null) {
+            datumIzmene = LocalDateTime.now();
+        }
+
+        if (status == null) {
+            status = StatusPosiljke.KREIRANA;
+        }
     }
 
     public Long getId() {
