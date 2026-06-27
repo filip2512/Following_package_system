@@ -1,64 +1,56 @@
-package com.example.demo.entity;
+package com.example.demo.dto.impl;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
-import jakarta.persistence.Table;
+import com.example.demo.entity.StatusPosiljke;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "posiljka")
-public class Posiljka {
+public class PosiljkaDto {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @NotBlank(message = "serijski broj je obavezan")
+    @Size(min = 3, max = 50, message = "Serijski broj mora imati izmedju 3 i 50 karaktera")
+    @Pattern(regexp = "^[A-Za-z0-9-]+$", message = "Serijski broj moze sadrzati samo slova, brojeve i crticu")
     private String serijskiBroj;
 
-    @Column(nullable = false, precision = 12, scale = 2)
+    @Positive(message = "iznos mora da bude veci od 0")
+    @NotNull(message = "iznos je obavezno polje")
     private BigDecimal ukupanIznos;
 
-    @Column(nullable = false)
     private LocalDateTime datumIzmene;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @NotNull(message = "status je obavezan")
     private StatusPosiljke status;
 
-    @Column(nullable = false, length = 1000)
+    @NotBlank(message = "opis je obavezan")
+    @Size(min = 3, max = 1000, message = "Opis sadrzaja mora imati izmedju 3 i 1000 karaktera")
     private String opisSadrzaja;
 
-    @Column(length = 1000, nullable= true)
+    @Size(max = 1000, message = "Napomena izmene moze imati najvise 1000 karaktera")
     private String napomenaIzmene;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_korisnika", nullable = false)
-    private Korisnik korisnik;
+    @NotNull(message = "korisnik je obavezan")
+    private Long korisnikId;
 
-    public Posiljka() {
+    public PosiljkaDto() {
     }
 
-    public Posiljka(String serijskiBroj, BigDecimal ukupanIznos, StatusPosiljke status,
-                   String opisSadrzaja, String napomenaIzmene, Korisnik korisnik) {
+    public PosiljkaDto(Long id, String serijskiBroj, BigDecimal ukupanIznos, LocalDateTime datumIzmene,
+                       StatusPosiljke status, String opisSadrzaja, String napomenaIzmene, Long korisnikId) {
+        this.id = id;
         this.serijskiBroj = serijskiBroj;
         this.ukupanIznos = ukupanIznos;
+        this.datumIzmene = datumIzmene;
         this.status = status;
         this.opisSadrzaja = opisSadrzaja;
         this.napomenaIzmene = napomenaIzmene;
-        this.korisnik = korisnik;
+        this.korisnikId = korisnikId;
     }
 
     public Long getId() {
@@ -89,8 +81,6 @@ public class Posiljka {
         return datumIzmene;
     }
 
-    public void setDatumIzmene() {this.datumIzmene = LocalDateTime.now();}
-
     public void setDatumIzmene(LocalDateTime datumIzmene) {
         this.datumIzmene = datumIzmene;
     }
@@ -119,11 +109,11 @@ public class Posiljka {
         this.napomenaIzmene = napomenaIzmene;
     }
 
-    public Korisnik getKorisnik() {
-        return korisnik;
+    public Long getKorisnikId() {
+        return korisnikId;
     }
 
-    public void setKorisnik(Korisnik korisnik) {
-        this.korisnik = korisnik;
+    public void setKorisnikId(Long korisnikId) {
+        this.korisnikId = korisnikId;
     }
 }
