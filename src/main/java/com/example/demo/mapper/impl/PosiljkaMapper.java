@@ -1,5 +1,6 @@
 package com.example.demo.mapper.impl;
 
+import com.example.demo.dto.impl.KorisnikDto;
 import com.example.demo.dto.impl.PosiljkaDto;
 import com.example.demo.entity.Korisnik;
 import com.example.demo.entity.Posiljka;
@@ -8,6 +9,11 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class PosiljkaMapper implements DtoEntityMapper<PosiljkaDto, Posiljka> {
+    private final KorisnikMapper korisnikMapper;
+
+    public PosiljkaMapper(KorisnikMapper korisnikMapper) {
+        this.korisnikMapper = korisnikMapper;
+    }
 
     @Override
     public PosiljkaDto toDto(Posiljka posiljka) {
@@ -15,7 +21,7 @@ public class PosiljkaMapper implements DtoEntityMapper<PosiljkaDto, Posiljka> {
             return null;
         }
 
-        Long korisnikId = posiljka.getKorisnik() == null ? null : posiljka.getKorisnik().getId();
+        KorisnikDto korisnikDto = korisnikMapper.toDto(posiljka.getKorisnik());
 
         return new PosiljkaDto(
                 posiljka.getId(),
@@ -25,7 +31,7 @@ public class PosiljkaMapper implements DtoEntityMapper<PosiljkaDto, Posiljka> {
                 posiljka.getStatus(),
                 posiljka.getOpisSadrzaja(),
                 posiljka.getNapomenaIzmene(),
-                korisnikId
+                korisnikDto
         );
     }
 
@@ -44,12 +50,34 @@ public class PosiljkaMapper implements DtoEntityMapper<PosiljkaDto, Posiljka> {
         posiljka.setOpisSadrzaja(posiljkaDto.getOpisSadrzaja());
         posiljka.setNapomenaIzmene(posiljkaDto.getNapomenaIzmene());
 
-        if (posiljkaDto.getKorisnikId() != null) {
-            Korisnik korisnik = new Korisnik();
-            korisnik.setId(posiljkaDto.getKorisnikId());
-            posiljka.setKorisnik(korisnik);
-        }
+        posiljka.setKorisnik(korisnikMapper.toEntity(posiljkaDto.getKorisnik()));
 
         return posiljka;
     }
+
+//    private KorisnikDto toKorisnikDto(Korisnik korisnik) {
+//        if (korisnik == null) {
+//            return null;
+//        }
+//
+//        return new KorisnikDto(
+//                korisnik.getId(),
+//                korisnik.getIme(),
+//                korisnik.getJmbg(),
+//                korisnik.getAdresa()
+//        );
+//    }
+//
+//    private Korisnik toKorisnikEntity(KorisnikDto korisnikDto) {
+//        if (korisnikDto == null) {
+//            return null;
+//        }
+//
+//        Korisnik korisnik = new Korisnik();
+//        korisnik.setId(korisnikDto.getId());
+//        korisnik.setIme(korisnikDto.getIme());
+//        korisnik.setJmbg(korisnikDto.getJmbg());
+//        korisnik.setAdresa(korisnikDto.getAdresa());
+//        return korisnik;
+//    }
 }

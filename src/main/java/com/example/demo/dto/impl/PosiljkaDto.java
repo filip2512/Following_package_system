@@ -1,6 +1,7 @@
 package com.example.demo.dto.impl;
 
 import com.example.demo.entity.StatusPosiljke;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -25,7 +26,6 @@ public class PosiljkaDto {
 
     private LocalDateTime datumIzmene;
 
-    @NotNull(message = "status je obavezan")
     private StatusPosiljke status;
 
     @NotBlank(message = "opis je obavezan")
@@ -35,14 +35,15 @@ public class PosiljkaDto {
     @Size(max = 1000, message = "Napomena izmene moze imati najvise 1000 karaktera")
     private String napomenaIzmene;
 
+    @Valid
     @NotNull(message = "korisnik je obavezan")
-    private Long korisnikId;
+    private KorisnikDto korisnik;
 
     public PosiljkaDto() {
     }
 
     public PosiljkaDto(Long id, String serijskiBroj, BigDecimal ukupanIznos, LocalDateTime datumIzmene,
-                       StatusPosiljke status, String opisSadrzaja, String napomenaIzmene, Long korisnikId) {
+                       StatusPosiljke status, String opisSadrzaja, String napomenaIzmene, KorisnikDto korisnik) {
         this.id = id;
         this.serijskiBroj = serijskiBroj;
         this.ukupanIznos = ukupanIznos;
@@ -50,7 +51,7 @@ public class PosiljkaDto {
         this.status = status;
         this.opisSadrzaja = opisSadrzaja;
         this.napomenaIzmene = napomenaIzmene;
-        this.korisnikId = korisnikId;
+        this.korisnik = korisnik;
     }
 
     public Long getId() {
@@ -109,11 +110,11 @@ public class PosiljkaDto {
         this.napomenaIzmene = napomenaIzmene;
     }
 
-    public Long getKorisnikId() {
-        return korisnikId;
+    public KorisnikDto getKorisnik() {
+        return korisnik;
     }
 
-    public void setKorisnikId(Long korisnikId) {
-        this.korisnikId = korisnikId;
+    public void setKorisnik(KorisnikDto korisnik) {
+        this.korisnik = korisnik;
     }
 }
