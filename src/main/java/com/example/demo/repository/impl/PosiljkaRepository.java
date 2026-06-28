@@ -75,16 +75,6 @@ public class PosiljkaRepository implements IRepository<Posiljka,Long> {
         return findBySerijskiBroj(serijskiBroj);
     }
 
-    public List<Posiljka> findLatestVersions() {
-        return manager.createQuery(
-                        "select p from Posiljka p where p.datumIzmene = "
-                                + "(select max(p2.datumIzmene) from Posiljka p2 "
-                                + "where p2.serijskiBroj = p.serijskiBroj) "
-                                + "order by p.datumIzmene desc",
-                        Posiljka.class
-                )
-                .getResultList();
-    }
 
     public List<Posiljka> findHistoryBySerijskiBroj(String serijskiBroj) {
         return manager.createQuery(
@@ -96,88 +86,14 @@ public class PosiljkaRepository implements IRepository<Posiljka,Long> {
                 .getResultList();
     }
 
-    public Optional<Posiljka> findBySerijskiBrojAndStatus(String serijskiBroj, StatusPosiljke status) {
-        return manager.createQuery(
-                        "select p from Posiljka p where p.serijskiBroj = :serijskiBroj "
-                                + "and p.status = :status order by p.datumIzmene desc, p.id desc",
-                        Posiljka.class
-                )
-                .setParameter("serijskiBroj", serijskiBroj)
-                .setParameter("status", status)
-                .setMaxResults(1)
-                .getResultStream()
-                .findFirst();
-    }
-
-    public Optional<Posiljka> findCreatedBySerijskiBroj(String serijskiBroj) {
-        return findBySerijskiBrojAndStatus(serijskiBroj, StatusPosiljke.KREIRANA);
-    }
-
-    public List<Posiljka> findByKorisnikId(Long korisnikId) {
-        return manager.createQuery(
-                        "select p from Posiljka p where p.korisnik.id = :korisnikId",
-                        Posiljka.class
-                )
-                .setParameter("korisnikId", korisnikId)
-                .getResultList();
-    }
-
-    public List<Posiljka> findByStatus(StatusPosiljke status) {
-        return manager.createQuery(
-                        "select p from Posiljka p where p.status = :status",
-                        Posiljka.class
-                )
-                .setParameter("status", status)
-                .getResultList();
-    }
-
-    public List<Posiljka> findByKorisnikIdAndStatus(Long korisnikId, StatusPosiljke status) {
-        return manager.createQuery(
-                        "select p from Posiljka p where p.korisnik.id = :korisnikId and p.status = :status",
-                        Posiljka.class
-                )
-                .setParameter("korisnikId", korisnikId)
-                .setParameter("status", status)
-                .getResultList();
-    }
-
-    public List<Posiljka> findByDatumIzmeneBetween(LocalDateTime od, LocalDateTime doDatuma) {
-        return manager.createQuery(
-                        "select p from Posiljka p where p.datumIzmene between :od and :doDatuma",
-                        Posiljka.class
-                )
-                .setParameter("od", od)
-                .setParameter("doDatuma", doDatuma)
-                .getResultList();
-    }
-
-    public List<Posiljka> findCreatedBetween(LocalDateTime od, LocalDateTime doDatuma) {
-        return manager.createQuery(
-                        "select p from Posiljka p where p.status = :status "
-                                + "and p.datumIzmene between :od and :doDatuma "
-                                + "order by p.datumIzmene desc",
-                        Posiljka.class
-                )
-                .setParameter("status", StatusPosiljke.KREIRANA)
-                .setParameter("od", od)
-                .setParameter("doDatuma", doDatuma)
-                .getResultList();
-    }
-
-    public List<Posiljka> filter(Long korisnikId, StatusPosiljke status) {
-        String query = "select p from Posiljka p where "
-                + "(:korisnikId is null or p.korisnik.id = :korisnikId) and "
-                + "(:status is null or p.status = :status)";
-
-        return manager.createQuery(query, Posiljka.class)
-                .setParameter("korisnikId", korisnikId)
-                .setParameter("status", status)
-                .getResultList();
-    }
-
-    public List<Posiljka> filter(Long korisnikId, StatusPosiljke status,
-                                 LocalDateTime kreiranoOd, LocalDateTime kreiranoDo) {
+    public List<Posiljka> filterLatest(Long korisnikId, StatusPosiljke status,
+                                       LocalDateTime kreiranoOd, LocalDateTime kreiranoDo) {
         StringBuilder query = new StringBuilder("select p from Posiljka p where 1 = 1");
+
+        query.append(" and p.datumIzmene = (")
+                .append("select max(poslednja.datumIzmene) from Posiljka poslednja ")
+                .append("where poslednja.serijskiBroj = p.serijskiBroj")
+                .append(")");
 
         if (korisnikId != null) {
             query.append(" and p.korisnik.id = :korisnikId");
@@ -201,9 +117,11 @@ public class PosiljkaRepository implements IRepository<Posiljka,Long> {
                     .append("select kreirana.id from Posiljka kreirana ")
                     .append("where kreirana.serijskiBroj = p.serijskiBroj ")
                     .append("and kreirana.status = :kreiranaStatus ")
-                    .append("and kreirana.datumIzmene <= :kreiranoDo")
+                    .append("and kreirana.datumIzmene < :kreiranoDo")
                     .append(")");
         }
+
+        query.append(" order by p.datumIzmene desc, p.id desc");
 
         TypedQuery<Posiljka> typedQuery = manager.createQuery(query.toString(), Posiljka.class);
 
