@@ -2,12 +2,11 @@ package com.example.demo.controller;
 
 import com.example.demo.dto.impl.PosiljkaDto;
 import com.example.demo.service.PosiljkaService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -29,5 +28,15 @@ public class PosiljkaController {
     @GetMapping("/history/{serijskiBroj}")
     public ResponseEntity<List<PosiljkaDto>> getOnePackageHistory(@PathVariable String serijskiBroj){
         return new ResponseEntity<>(service.findHistory(serijskiBroj),HttpStatus.OK);
+    }
+    @PostMapping
+    public ResponseEntity<PosiljkaDto> addPosiljka(@Valid @RequestBody @NotNull PosiljkaDto p){
+        PosiljkaDto saved = service.create(p);
+        return new ResponseEntity<>(saved, HttpStatus.CREATED);
+    }
+    @PutMapping
+    public ResponseEntity<PosiljkaDto> updatePosiljka(@Valid @RequestBody @NotNull PosiljkaDto p){
+        PosiljkaDto saved = service.update(p);
+        return new ResponseEntity<>(saved, HttpStatus.CREATED);
     }
 }
