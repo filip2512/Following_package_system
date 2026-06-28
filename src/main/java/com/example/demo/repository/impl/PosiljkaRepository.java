@@ -40,9 +40,18 @@ public class PosiljkaRepository implements IRepository<Posiljka,Long> {
 
     @Override
     public List<Posiljka> findAll() {
-        return manager.createQuery("select p from Posiljka p", Posiljka.class)
+        return manager.createNativeQuery("SELECT p.*\n" +
+                        "FROM posiljka p\n" +
+                        "JOIN (\n" +
+                        "    SELECT serijski_broj, MAX(datum_izmene) AS poslednji_datum\n" +
+                        "    FROM posiljka\n" +
+                        "    GROUP BY serijski_broj\n" +
+                        ") poslednja\n" +
+                        "ON p.serijski_broj = poslednja.serijski_broj\n" +
+                        "AND p.datum_izmene = poslednja.poslednji_datum", Posiljka.class)
                 .getResultList();
     }
+
 
     @Override
     @Transactional
