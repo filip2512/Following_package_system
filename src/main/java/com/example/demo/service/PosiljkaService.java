@@ -61,6 +61,6 @@ public class PosiljkaService {
     }
 
     public PosiljkaDto update(@Valid @NotNull PosiljkaDto p) {
-        
+
     }
 }

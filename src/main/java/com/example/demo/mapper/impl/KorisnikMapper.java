@@ -43,47 +43,4 @@ public class KorisnikMapper implements DtoEntityMapper<KorisnikDto, Korisnik> {
         korisnik.setAdresa(korisnikDto.getAdresa());
         return korisnik;
     }
-
-//    @Override
-//    public KorisnikDto toDto(Korisnik korisnik) {
-//        if (korisnik == null) {
-//            return null;
-//        }
-//
-//        List<PosiljkaDto> posiljke = korisnik.getPosiljke()
-//                .stream()
-//                .map(posiljkaMapper::toDto)
-//                .toList();
-//
-//        return new KorisnikDto(
-//                korisnik.getId(),
-//                korisnik.getIme(),
-//                korisnik.getJmbg(),
-//                korisnik.getAdresa(),
-//                posiljke
-//        );
-//    }
-//
-//    @Override
-//    public Korisnik toEntity(KorisnikDto korisnikDto) {
-//        if (korisnikDto == null) {
-//            return null;
-//        }
-//
-//        Korisnik korisnik = new Korisnik();
-//        korisnik.setId(korisnikDto.getId());
-//        korisnik.setIme(korisnikDto.getIme());
-//        korisnik.setJmbg(korisnikDto.getJmbg());
-//        korisnik.setAdresa(korisnikDto.getAdresa());
-//
-//        List<Posiljka> posiljke = korisnikDto.getPosiljke()
-//                .stream()
-//                .map(posiljkaMapper::toEntity)
-//                .toList();
-//
-//        posiljke.forEach(posiljka -> posiljka.setKorisnik(korisnik));
-//        korisnik.setPosiljke(posiljke);
-//
-//        return korisnik;
-//    }
 }
