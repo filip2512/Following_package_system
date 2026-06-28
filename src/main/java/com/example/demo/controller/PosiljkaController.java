@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.dto.impl.PosiljkaDto;
+import com.example.demo.dto.impl.PosiljkaUpdateDto;
 import com.example.demo.service.PosiljkaService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -35,7 +36,7 @@ public class PosiljkaController {
         return new ResponseEntity<>(saved, HttpStatus.CREATED);
     }
     @PutMapping
-    public ResponseEntity<PosiljkaDto> updatePosiljka(@Valid @RequestBody @NotNull PosiljkaDto p){
+    public ResponseEntity<PosiljkaDto> updatePosiljka(@Valid @RequestBody @NotNull PosiljkaUpdateDto p){
         PosiljkaDto saved = service.update(p);
         return new ResponseEntity<>(saved, HttpStatus.CREATED);
     }

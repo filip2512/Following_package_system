@@ -55,29 +55,4 @@ public class PosiljkaMapper implements DtoEntityMapper<PosiljkaDto, Posiljka> {
         return posiljka;
     }
 
-//    private KorisnikDto toKorisnikDto(Korisnik korisnik) {
-//        if (korisnik == null) {
-//            return null;
-//        }
-//
-//        return new KorisnikDto(
-//                korisnik.getId(),
-//                korisnik.getIme(),
-//                korisnik.getJmbg(),
-//                korisnik.getAdresa()
-//        );
-//    }
-//
-//    private Korisnik toKorisnikEntity(KorisnikDto korisnikDto) {
-//        if (korisnikDto == null) {
-//            return null;
-//        }
-//
-//        Korisnik korisnik = new Korisnik();
-//        korisnik.setId(korisnikDto.getId());
-//        korisnik.setIme(korisnikDto.getIme());
-//        korisnik.setJmbg(korisnikDto.getJmbg());
-//        korisnik.setAdresa(korisnikDto.getAdresa());
-//        return korisnik;
-//    }
 }

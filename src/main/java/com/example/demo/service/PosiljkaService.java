@@ -1,6 +1,7 @@
 package com.example.demo.service;
 
 import com.example.demo.dto.impl.PosiljkaDto;
+import com.example.demo.dto.impl.PosiljkaUpdateDto;
 import com.example.demo.entity.Korisnik;
 import com.example.demo.entity.Posiljka;
 import com.example.demo.entity.StatusPosiljke;
@@ -11,27 +12,25 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
 public class PosiljkaService {
 
     private final PosiljkaRepository repository;
-    private final KorisnikRepository korisnikRepository;
     private final PosiljkaMapper mapper;
     private final KorisnikService korisnikService;
 
     @Autowired
-    public PosiljkaService(PosiljkaRepository repository, KorisnikRepository korisnikRepository, PosiljkaMapper mapper, KorisnikService korisnikService, KorisnikService korisnikService1) {
+    public PosiljkaService(PosiljkaRepository repository, PosiljkaMapper mapper, KorisnikService korisnikService) {
         this.repository = repository;
-        this.korisnikRepository = korisnikRepository;
         this.mapper = mapper;
-        this.korisnikService = korisnikService1;
-
+        this.korisnikService = korisnikService;
     }
     @Transactional
     public List<PosiljkaDto> findAll(){
@@ -60,7 +59,23 @@ public class PosiljkaService {
         return mapper.toDto(posiljka);
     }
 
-    public PosiljkaDto update(@Valid @NotNull PosiljkaDto p) {
-        
+    @Transactional
+    public PosiljkaDto update(@Valid @NotNull PosiljkaUpdateDto p) {
+        Posiljka trenutnaVerzija = repository.findLatestBySerijskiBroj(p.getSerijskiBroj())
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Posiljka sa serijskim brojem " + p.getSerijskiBroj() + " ne postoji"
+                ));
+
+        Posiljka novaVerzija = new Posiljka();
+        novaVerzija.setSerijskiBroj(trenutnaVerzija.getSerijskiBroj());
+        novaVerzija.setUkupanIznos(trenutnaVerzija.getUkupanIznos());
+        novaVerzija.setOpisSadrzaja(trenutnaVerzija.getOpisSadrzaja());
+        novaVerzija.setKorisnik(trenutnaVerzija.getKorisnik());
+        novaVerzija.setStatus(p.getStatus());
+        novaVerzija.setNapomenaIzmene(p.getNapomenaIzmene());
+        novaVerzija.setDatumIzmene();
+
+        return mapper.toDto(repository.save(novaVerzija));
     }
 }
